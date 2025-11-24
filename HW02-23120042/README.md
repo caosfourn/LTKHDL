@@ -84,7 +84,7 @@ Yêu cầu: Python 3.8+ và các thư viện trong `requirements.txt`.
 
 1.  **Clone repository:**
     ```bash
-    git clone [https://github.com/username/project-name.git](https://github.com/username/project-name.git)
+    git clone https://github.com/caosfourn/LTKHDL.git
     cd project-name
     ```
 
@@ -190,7 +190,7 @@ MSSV: 23120042
 
 Mọi ý kiến đóng góp hoặc thắc mắc, vui lòng liên hệ:
 * **Email:** huynhdnhannd@gmail.com
-* **GitHub:** [Link GitHub của bạn]
+* **GitHub:** https://github.com/caosfourn
 
 ## License
 
