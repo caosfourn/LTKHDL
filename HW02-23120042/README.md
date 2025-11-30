@@ -204,4 +204,4 @@ Mọi ý kiến đóng góp hoặc thắc mắc, vui lòng liên hệ:
 
 ## License
 
-Dự án này được phân phối dưới giấy phép **MIT License**.
+CC0: Public Domain.
