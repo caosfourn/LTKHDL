@@ -119,12 +119,12 @@ Kết quả đánh giá trên tập kiểm thử (Test Set):
 
 | Model               | Accuracy   | Precision | Recall | F1-Score | Thời gian chạy |
 |---------------------|------------|-----------|--------|----------|----------------|
-| **Random Forest**   | **77.32%** | 0.60      | 0.36   | **0.45** | 0.78s          |
-| Logistic Regression | 77.26%     | -         | -      | -        | 4.53s          |
-| Decision Tree       | 77.08%     | -         | -      | -        | 2.32s          |
-| KNN                 | 76.74%     |           | -      | -        | 1.28s          |
+| **Decision Tree**   | **77.73%** | 0.5656    | 0.5856 | **0.57** | 2.12s          |
+| Random Forest       | 77.50%     | -         | -      | -        | 1.51s          |
+| Logistic Regression | 77.32%     | -         | -      | -        | 4.43s          |
+| KNN                 | 75.88%     |           | -      | -        | 75.88%         |
 
-* **Nhận xét:** Random Forest cho kết quả tốt nhất về độ chính xác.
+* **Nhận xét:** Decision Tree cho kết quả tốt nhất về độ chính xác.
 * **Vấn đề:** Recall và F1-Score còn thấp do dữ liệu bị mất cân bằng (Imbalanced Dataset - Nhóm không nghỉ việc chiếm đa số).
 
 **Trực quan hóa:**
@@ -153,21 +153,31 @@ project-name/
 ```
 ## Challenges & Solutions
 
-Trong quá trình xây dựng các thuật toán Machine Learning từ đầu (from scratch) với **NumPy**, em đã gặp và giải quyết các thách thức sau:
+Là một sinh viên lần đầu xây dựng các thuật toán Machine Learning hoàn toàn bằng NumPy mà không dùng thư viện có sẵn (như Scikit-learn), em đã đối mặt với những "cú sốc" khi chuyển đổi tư duy lập trình:
 
-* **1. Tối ưu hóa tốc độ tính toán (Vectorization):**
-    * *Vấn đề:* Việc sử dụng vòng lặp `for` trong Python để tính khoảng cách (trong KNN) hoặc tính Gradient (trong Logistic Regression) rất chậm trên tập dữ liệu lớn (~20,000 dòng).
-    * *Giải pháp:* Thay thế hoàn toàn vòng lặp bằng kỹ thuật **Broadcasting** và **Vectorization** của NumPy.
-        * Ví dụ: Trong KNN, thay vì tính từng điểm, nhóm áp dụng công thức $||a-b||^2 = ||a||^2 + ||b||^2 - 2a.b$ để tính toàn bộ ma trận khoảng cách cùng lúc.
-        * Trong Logistic Regression, sử dụng `np.einsum` (Einstein summation) để tính tích vô hướng nhanh hơn `np.dot` thông thường.
+* **1. "Ác mộng" về kích thước chiều (Broadcasting & Shapes):**
 
-* **2. Xử lý sự khác biệt về chiều (Shape Mismatch):**
-    * *Vấn đề:* Thường xuyên gặp lỗi `ValueError` khi thực hiện các phép toán giữa vector hàng, vector cột và ma trận trọng số.
-    * *Giải pháp:* Kiểm soát chặt chẽ chiều dữ liệu bằng `np.reshape(-1, 1)` và `np.newaxis` để đảm bảo tính tương thích khi Broadcasting.
+    * Vấn đề: Đây là khó khăn lớn nhất. Em thường xuyên gặp lỗi ValueError: operands could not be broadcast together with shapes.... Rất dễ nhầm lẫn giữa mảng 1 chiều (n,) (Rank-1 array) và vector cột (n, 1). Khi nhân ma trận hoặc trừ vector, kết quả thường ra một ma trận khổng lồ không mong muốn do cơ chế broadcasting tự động của NumPy.
 
-* **3. Dữ liệu mất cân bằng (Imbalanced Dataset):**
-    * *Vấn đề:* Tỉ lệ người nghỉ việc (Target=1) chỉ chiếm khoảng 25%, khiến mô hình có xu hướng dự đoán nghiêng về lớp 0 (Accuracy cao nhưng Recall thấp).
-    * *Giải pháp:* Không chỉ dựa vào Accuracy, nhóm sử dụng thêm **Confusion Matrix**, **Precision** và **Recall** để đánh giá thực chất hiệu quả của mô hình.
+    * Giải pháp: Em tập thói quen luôn kiểm tra .shape sau mỗi phép tính. Sử dụng reshape(-1, 1) để đảm bảo các vector luôn đúng chiều mong muốn trước khi tính toán.
+
+* **2. Khó khăn khi chuyển công thức Toán học sang Code Vector:**
+
+    * Vấn đề: Hiểu công thức toán (ví dụ: tính Entropy, Gini Index hay Gradient) trên giấy là một chuyện, nhưng code lại mà không dùng vòng lặp for là chuyện khác. Việc phải hình dung phép tính diễn ra đồng thời trên cả ma trận (Batch processing) rất trừu tượng và khó hiểu lúc đầu.
+
+    * Giải pháp: Em phải vẽ nháp ma trận ra giấy để hình dung xem cần tính tổng theo dòng (axis=1) hay theo cột (axis=0). Học cách tận dụng các hàm np.sum, np.mean kết hợp với axis chính xác.
+
+* **3. Xử lý dữ liệu "bẩn" chỉ với NumPy:**
+
+    * Vấn đề: Khi không dùng Pandas, việc xử lý các giá trị thiếu (Missing values), chuỗi ký tự lạ (như >20, never) hay các cột phân loại (Category) rất vất vả. Chỉ một giá trị lạ cũng khiến toàn bộ mảng NumPy biến thành kiểu chuỗi (string), không thể tính toán được.
+
+    * Giải pháp: Phải viết các hàm thủ công dùng np.where và np.unique để thay thế Pandas. Em học được cách dùng np.genfromtxt cẩn thận hơn và viết các hàm "ép kiểu" an toàn để lọc dữ liệu lỗi.
+
+* **4. Lỗi Logic tiềm ẩn trong thuật toán (Debugging):**
+
+    * Vấn đề: Có những lỗi không báo ngay lập tức (như Syntax Error) mà chạy rất êm, nhưng kết quả lại sai hoặc báo lỗi NoneType bất ngờ (như lỗi trong Decision Tree khi chia node rỗng). Việc debug thuật toán tự viết khó hơn nhiều so với việc gọi hàm thư viện.
+
+    * Giải pháp: Chia nhỏ hàm để test từng phần. Em học được bài học lớn về việc khởi tạo giá trị ban đầu (như best_gain = 0 thay vì -1) để tránh các trường hợp ngoại lệ trong thuật toán.
 
 ## Future Improvements
 
