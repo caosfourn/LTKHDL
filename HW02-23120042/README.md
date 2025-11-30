@@ -155,7 +155,7 @@ project-name/
 
 Là một sinh viên lần đầu xây dựng các thuật toán Machine Learning hoàn toàn bằng NumPy mà không dùng thư viện có sẵn (như Scikit-learn), em đã đối mặt với những "cú sốc" khi chuyển đổi tư duy lập trình:
 
-* **1. "Ác mộng" về kích thước chiều (Broadcasting & Shapes):**
+* **1. Khó khăn về kích thước chiều (Broadcasting & Shapes):**
 
     * Vấn đề: Đây là khó khăn lớn nhất. Em thường xuyên gặp lỗi ValueError: operands could not be broadcast together with shapes.... Rất dễ nhầm lẫn giữa mảng 1 chiều (n,) (Rank-1 array) và vector cột (n, 1). Khi nhân ma trận hoặc trừ vector, kết quả thường ra một ma trận khổng lồ không mong muốn do cơ chế broadcasting tự động của NumPy.
 
